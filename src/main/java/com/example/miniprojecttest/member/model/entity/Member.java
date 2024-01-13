@@ -1,4 +1,4 @@
-package com.example.miniprojecttest.member.model;
+package com.example.miniprojecttest.member.model.entity;
 
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
@@ -28,7 +28,7 @@ public class Member implements UserDetails {
     @Column(nullable = false)
     private String consumerAddr;
     @Column(nullable = false)
-    private String consunmerPhoneNum;
+    private String consumerPhoneNum;
     private String authority;
     private Boolean socialLogin;
     private Boolean status;         // email 인증 여부

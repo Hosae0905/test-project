@@ -1,7 +1,7 @@
 package com.example.miniprojecttest.config.filter;
 
 
-import com.example.miniprojecttest.member.model.Member;
+import com.example.miniprojecttest.member.model.entity.Member;
 import com.example.miniprojecttest.member.service.MemberService;
 import com.example.miniprojecttest.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;

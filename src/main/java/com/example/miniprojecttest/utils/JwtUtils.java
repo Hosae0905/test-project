@@ -9,7 +9,7 @@ import java.security.Key;
 import java.util.Date;
 
 public class JwtUtils {
-    public static String generateAccessToken(String username,String key, int expiredTimeMs) {
+    public static String generateAccessToken(String username, String key, int expiredTimeMs) {
         Claims claims = Jwts.claims();
         claims.put("username", username);
 
