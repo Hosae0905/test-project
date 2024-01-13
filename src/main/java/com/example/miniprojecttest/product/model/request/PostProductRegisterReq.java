@@ -10,7 +10,8 @@ import lombok.Getter;
 public class PostProductRegisterReq {
     private String productName;
     private Integer price;
+    private Integer salePrice;
     private String productInfo;
-    
+
     // TODO: 인원수, 마감일
 }
