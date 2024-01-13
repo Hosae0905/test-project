@@ -17,9 +17,9 @@ import java.util.Collections;
 public class Seller implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer sellerIdx;
+    private Long sellerIdx;
     @Column(nullable = false)
-    private String sellerID;
+    private String email;
     @Column(nullable = false)
     private String sellerPW;
     @Column(nullable = false)
@@ -45,7 +45,7 @@ public class Seller implements UserDetails {
 
     @Override
     public String getUsername() {
-        return sellerID;
+        return email;
     }
 
     @Override

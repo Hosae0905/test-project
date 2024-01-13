@@ -17,9 +17,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
     private final MemberService memberService;
 
-
-
-
     public SecurityConfig(MemberService memberService) {
         this.memberService = memberService;
     }

@@ -1,13 +1,14 @@
 package com.example.miniprojecttest.member.model.entity;
 
+import com.example.miniprojecttest.cart.model.entity.Cart;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 @Entity
 @Getter
@@ -18,9 +19,9 @@ import java.util.Collections;
 public class Member implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer consumerIdx;
+    private Long consumerIdx;
     @Column(nullable = false)
-    private String consumerID;
+    private String email;
     @Column(nullable = false)
     private String consumerPW;
     @Column(nullable = false)
@@ -32,6 +33,9 @@ public class Member implements UserDetails {
     private String authority;
     private Boolean socialLogin;
     private Boolean status;         // email 인증 여부
+
+    @OneToMany(mappedBy = "member")
+    private List<Cart> carts;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -46,7 +50,7 @@ public class Member implements UserDetails {
 
     @Override
     public String getUsername() {
-        return consumerID;
+        return email;
     }
 
     @Override
