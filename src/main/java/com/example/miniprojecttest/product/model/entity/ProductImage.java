@@ -2,6 +2,7 @@ package com.example.miniprojecttest.product.model.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
@@ -10,6 +11,7 @@ import javax.persistence.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
 public class ProductImage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,6 +20,6 @@ public class ProductImage {
     private String imagePath;
 
     @ManyToOne
-    @Column(name = "Product_idx")
+    @JoinColumn(name = "Product_idx")
     private Product product;
 }

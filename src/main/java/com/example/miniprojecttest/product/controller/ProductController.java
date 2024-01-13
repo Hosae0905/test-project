@@ -1,14 +1,15 @@
 package com.example.miniprojecttest.product.controller;
 
+import com.example.miniprojecttest.member.model.entity.Seller;
+import com.example.miniprojecttest.product.model.entity.Product;
 import com.example.miniprojecttest.product.model.request.PostProductRegisterReq;
 import com.example.miniprojecttest.product.model.request.PostProductResgisterRes;
 import com.example.miniprojecttest.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
@@ -17,15 +18,12 @@ import java.security.Principal;
 @RequestMapping("/product")
 @RequiredArgsConstructor
 public class ProductController {
-    ProductService productService;
+    private final ProductService productService;
 
     @RequestMapping(method = RequestMethod.POST, value = "/register")
-    public ResponseEntity register(Principal principal, @RequestPart PostProductRegisterReq productRegisterReq, @RequestPart MultipartFile[] images) {
-
-        PostProductResgisterRes postProductResgisterRes = productService.register(principal,productRegisterReq,images);
-
+    public ResponseEntity register(@AuthenticationPrincipal String email, @RequestPart PostProductRegisterReq productRegisterReq, @RequestPart MultipartFile[] images) {
+        PostProductResgisterRes postProductResgisterRes = productService.register(email,productRegisterReq,images);
         return ResponseEntity.ok(postProductResgisterRes);
-
     }
 
     /* @RequestMapping(method = RequestMethod.POST, value = "/list")

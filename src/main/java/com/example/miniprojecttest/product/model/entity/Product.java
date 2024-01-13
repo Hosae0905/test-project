@@ -1,5 +1,6 @@
 package com.example.miniprojecttest.product.model.entity;
 
+import com.example.miniprojecttest.cart.model.entity.Cart;
 import com.example.miniprojecttest.member.model.entity.Seller;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,6 +35,13 @@ public class Product {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "Customer_ID")
     private Seller sellerIdx ;
+
     // 판매자 ID
+
+
     // 카테고리 ID
+
+    // 장바구니
+    @OneToMany(mappedBy = "product")
+    private List<Cart> carts;
 }

@@ -7,7 +7,9 @@ import com.example.miniprojecttest.product.model.request.PostProductRegisterReq;
 import com.example.miniprojecttest.product.model.request.PostProductResgisterRes;
 import com.example.miniprojecttest.product.repository.ProductImageRepository;
 import com.example.miniprojecttest.product.repository.ProductRepository;
+import com.example.miniprojecttest.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,15 +21,19 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
-    private final ProductImageRepository imageRepository;
     private final ImageSaveService imageSaveService;
     private final SellerRepository sellerRepository;
 
-    // TODO: 상품 등록
-    public PostProductResgisterRes register(Principal principal, @RequestPart PostProductRegisterReq productRegisterReq, @RequestPart MultipartFile[] images) {
 
-        String SellerID = principal.getName();
-        Optional<Seller> seller = sellerRepository.findBySellerID(SellerID);
+    @Value("${jwt.secret-key}")
+    private String secretKey;
+
+
+
+    // TODO: 상품 등록
+    public PostProductResgisterRes register(String email, PostProductRegisterReq productRegisterReq, MultipartFile[] images) {
+
+        Optional<Seller> seller = sellerRepository.findByEmail(email);
 
         Seller user;
         if (seller.isPresent()) {
