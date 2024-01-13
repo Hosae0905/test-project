@@ -1,7 +1,7 @@
 package com.example.miniprojecttest.member.repository;
 
 
-import com.example.miniprojecttest.member.model.EmailVerify;
+import com.example.miniprojecttest.member.model.entity.EmailVerify;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

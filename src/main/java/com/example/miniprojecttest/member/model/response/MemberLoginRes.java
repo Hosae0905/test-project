@@ -1,4 +1,4 @@
-package com.example.miniprojecttest.member.model;
+package com.example.miniprojecttest.member.model.response;
 
 import lombok.Builder;
 import lombok.Data;

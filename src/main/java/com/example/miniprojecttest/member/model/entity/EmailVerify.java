@@ -1,4 +1,4 @@
-package com.example.miniprojecttest.member.model;
+package com.example.miniprojecttest.member.model.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

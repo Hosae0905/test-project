@@ -1,25 +1,27 @@
 package com.example.miniprojecttest.member.service;
 
-import com.example.miniprojecttest.config.PasswordEncoderConfig;
-import com.example.miniprojecttest.member.model.Member;
-import com.example.miniprojecttest.member.model.MemberLoginReq;
-import com.example.miniprojecttest.member.model.MemberLoginRes;
-import com.example.miniprojecttest.member.model.MemberSignupReq;
+import com.example.miniprojecttest.member.model.entity.Member;
+import com.example.miniprojecttest.member.model.entity.Seller;
+import com.example.miniprojecttest.member.model.request.MemberLoginReq;
+import com.example.miniprojecttest.member.model.request.MemberSignupReq;
+import com.example.miniprojecttest.member.model.request.SellerSignupReq;
+import com.example.miniprojecttest.member.model.request.SendEmailReq;
 import com.example.miniprojecttest.member.repository.MemberRepository;
+import com.example.miniprojecttest.member.repository.SellerRepository;
 import com.example.miniprojecttest.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
+
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -27,8 +29,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class MemberService implements UserDetailsService {
     private final MemberRepository memberRepository;
+    private final SellerRepository sellerRepository;
     private final PasswordEncoder passwordEncoder;
-
     private final JavaMailSender emailSender;
     private final EmailVerifyService emailVerifyService;
 
@@ -38,69 +40,87 @@ public class MemberService implements UserDetailsService {
     @Value("${jwt.token.expired-time-ms}")
     private int expiredTimeMs;
 
-    public void consumerSignup(MemberSignupReq memberSignupReq) {
+    public Member consumerSignup(MemberSignupReq memberSignupReq) {
         Member member = Member.builder()
                 .consumerID(memberSignupReq.getConsumerID())
                 .consumerPW(passwordEncoder.encode(memberSignupReq.getConsumerPW()))
                 .consumerName(memberSignupReq.getConsumerName())
                 .consumerAddr(memberSignupReq.getConsumerAddr())
-                .consunmerPhoneNum(memberSignupReq.getConsunmerPhoneNum())
+                .consumerPhoneNum(memberSignupReq.getConsumerPhoneNum())
                 .authority("CONSUMER")
                 .socialLogin(false)
                 .status(false)
                 .build();
 
-        member = memberRepository.save(member);
+        SendEmailReq sendEmailReq = SendEmailReq.builder()
+                .email(member.getConsumerID())
+                .authority(member.getAuthority())
+                .build();
 
-
+        sendEmail(sendEmailReq);
+        memberRepository.save(member);
+        return member;
 
     }
-//    public void sellerSignup(MemberSignupReq memberSignupReq) {
-//        Member member = Member.builder()
-//                .consumerID(memberSignupReq.getConsumerID())
-//                .consumerPW(passwordEncoder.encode(memberSignupReq.getConsumerPW()))
-//                .consumerName(memberSignupReq.getConsumerName())
-//                .consumerAddr(memberSignupReq.getConsumerAddr())
-//                .consunmerPhoneNum(memberSignupReq.getConsunmerPhoneNum())
-//                .authority("SELLER")
-//                .socialLogin(false)
-//                .status(false)
-//                .build();
-//
-//        member = memberRepository.save(member);
-//
-//    }
+    public Seller sellerSignup(SellerSignupReq sellerSignupReq) {
+        Seller seller = Seller.builder()
+                .sellerID(sellerSignupReq.getSellerID())
+                .sellerPW(sellerSignupReq.getSellerPW())
+                .sellerName(sellerSignupReq.getSellerName())
+                .sellerAddr(sellerSignupReq.getSellerAddr())
+                .sellerPhoneNum(sellerSignupReq.getSellerPhoneNum())
+                .sellerBusinessNumber(sellerSignupReq.getSellerBusinessNumber())
+                .authority("SELLER")
+                .status(false)
+                .build();
 
-    public MemberLoginRes login(MemberLoginReq memberLoginReq) {
-        String jwt = JwtUtils.generateAccessToken(memberLoginReq.getUsername(), secretKey, expiredTimeMs);
-        MemberLoginRes memberLoginRes = MemberLoginRes.builder()
-                .token(jwt).build();
-        return memberLoginRes;
+        SendEmailReq sendEmailReq = SendEmailReq.builder()
+                .email(seller.getSellerID())
+                .authority(seller.getAuthority())
+                .build();
+
+        sendEmail(sendEmailReq);
+        sellerRepository.save(seller);
+
+        return seller;
+
+    }
+
+    public Map<String,String> login(MemberLoginReq memberLoginReq) {
+        Optional<Member> member = memberRepository.findByConsumerID(memberLoginReq.getUsername());
+
+        if (member.isPresent()) {
+            if (passwordEncoder.matches(memberLoginReq.getPassword(), member.get().getPassword())) {
+
+                Map<String, String> response = new HashMap<>();
+                response.put("token", JwtUtils.generateAccessToken(member.get().getUsername(), secretKey, expiredTimeMs));
+                return response;
+
+            }else {
+                return null;
+            }
         }
+        return null;
+    }
 
 
-    public void sendEmail(MemberSignupReq memberSignupReq) {
+    public void sendEmail(SendEmailReq sendEmailReq) {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(memberSignupReq.getConsumerID());
-        message.setSubject("[심마켓] 이메일 인증");
+        message.setTo(sendEmailReq.getEmail());
+        message.setSubject("로컬푸드 pampam 이메일 인증");
         String uuid = UUID.randomUUID().toString();
         message.setText("http://localhost:8080/member/confirm?email="
-                + memberSignupReq.getConsumerID()
+                + sendEmailReq.getEmail()
+                + "&authority=" + sendEmailReq.getAuthority()
                 + "&token=" + uuid
-                + "&jwt=" + JwtUtils.generateAccessToken(memberSignupReq.getConsumerID(), secretKey, expiredTimeMs)
+                + "&jwt=" + JwtUtils.generateAccessToken(sendEmailReq.getEmail(), secretKey, expiredTimeMs)
         );
         emailSender.send(message);
 
-        emailVerifyService.create(memberSignupReq.getConsumerID(), uuid);
+        emailVerifyService.create(sendEmailReq.getEmail(), uuid);
     }
-    public void update(String email) {
-        Optional<Member> result = memberRepository.findByConsumerID(email);
-        if(result.isPresent()) {
-            Member member = result.get();
-            member.setStatus(true);
-            memberRepository.save(member);
-        }
-    }
+
+
     public Member getMemberByConsumerID(String consumerID) {
         Optional<Member> result = memberRepository.findByConsumerID(consumerID);
         if(result.isPresent()){
