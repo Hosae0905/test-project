@@ -1,4 +1,4 @@
-package com.example.miniprojecttest.product.model.request;
+package com.example.miniprojecttest.product.model.response;
 
 import com.example.miniprojecttest.product.model.entity.Product;
 import lombok.*;
