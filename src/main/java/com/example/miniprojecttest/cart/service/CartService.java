@@ -3,8 +3,8 @@ package com.example.miniprojecttest.cart.service;
 import com.example.miniprojecttest.cart.model.entity.Cart;
 import com.example.miniprojecttest.cart.model.response.GetCartListRes;
 import com.example.miniprojecttest.cart.repository.CartRepository;
-import com.example.miniprojecttest.member.model.entity.Member;
-import com.example.miniprojecttest.member.repository.MemberRepository;
+import com.example.miniprojecttest.member.model.entity.Consumer;
+import com.example.miniprojecttest.member.repository.ConsumerRepository;
 import com.example.miniprojecttest.product.model.entity.Product;
 import com.example.miniprojecttest.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
@@ -19,13 +19,13 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CartService {
     private final CartRepository cartRepository;
-    private final MemberRepository memberRepository;
+    private final ConsumerRepository memberRepository;
 
     @Value("${jwt.secret-key}")
     private String secretKey;
 
     public void cartIn(Long productIdx, String email) {
-        Optional<Member> member = memberRepository.findByEmail(email);
+        Optional<Consumer> member = memberRepository.findByEmail(email);
 
         if (member.isPresent()) {
             cartRepository.save(Cart.builder()
@@ -37,10 +37,10 @@ public class CartService {
 
     public void cartList(String email) {
 
-        Optional<Member> member = memberRepository.findByEmail(email);
+        Optional<Consumer> member = memberRepository.findByEmail(email);
 
         if (member.isPresent()) {
-            List<Cart> carts = cartRepository.findAllByMember(Member.builder().consumerIdx(member.get().getConsumerIdx()).build());
+            List<Cart> carts = cartRepository.findAllByMember(Consumer.builder().consumerIdx(member.get().getConsumerIdx()).build());
             List<GetCartListRes> cartList = new ArrayList<>();
 
             for (Cart cart : carts) {
@@ -62,7 +62,7 @@ public class CartService {
 
         Long memberIdx = JwtUtils.getUserIdx(token, secretKey);
 
-        Optional<Member> member = memberRepository.findById(memberIdx);
+        Optional<Consumer> member = memberRepository.findById(memberIdx);
 
         if (member.isPresent()) {
             cartRepository.deleteById(cartIdx);

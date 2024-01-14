@@ -2,11 +2,11 @@ package com.example.miniprojecttest.member.service;
 
 
 import com.example.miniprojecttest.member.model.entity.EmailVerify;
-import com.example.miniprojecttest.member.model.entity.Member;
+import com.example.miniprojecttest.member.model.entity.Consumer;
 import com.example.miniprojecttest.member.model.entity.Seller;
 import com.example.miniprojecttest.member.model.request.GetEmailConfirmReq;
 import com.example.miniprojecttest.member.repository.EmailVerifyRepository;
-import com.example.miniprojecttest.member.repository.MemberRepository;
+import com.example.miniprojecttest.member.repository.ConsumerRepository;
 import com.example.miniprojecttest.member.repository.SellerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class EmailVerifyService {
     private final EmailVerifyRepository emailVerifyRepository;
-    private final MemberRepository memberRepository;
+    private final ConsumerRepository memberRepository;
     private final SellerRepository sellerRepository;
 
     public RedirectView verify(GetEmailConfirmReq getEmailConfirmReq) {
@@ -35,9 +35,9 @@ public class EmailVerifyService {
 
     public void update(String email, String authority) {
         if (authority.equals("CONSUMER")){
-            Optional<Member> result = memberRepository.findByEmail(email);
+            Optional<Consumer> result = memberRepository.findByEmail(email);
             if(result.isPresent()) {
-                Member member = result.get();
+                Consumer member = result.get();
                 member.setStatus(true);
                 memberRepository.save(member);
             }

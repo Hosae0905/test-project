@@ -1,6 +1,6 @@
 package com.example.miniprojecttest.cart.model.entity;
 
-import com.example.miniprojecttest.member.model.entity.Member;
+import com.example.miniprojecttest.member.model.entity.Consumer;
 import com.example.miniprojecttest.product.model.entity.Product;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,5 +27,5 @@ public class Cart {
     // 구매자랑 연관관계 맺기
     @ManyToOne
     @JoinColumn(name = "Member_idx")
-    private Member member;
+    private Consumer member;
 }
