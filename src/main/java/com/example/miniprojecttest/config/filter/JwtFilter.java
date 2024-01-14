@@ -2,6 +2,7 @@ package com.example.miniprojecttest.config.filter;
 
 
 import com.example.miniprojecttest.member.model.entity.Member;
+import com.example.miniprojecttest.member.model.entity.Seller;
 import com.example.miniprojecttest.member.service.MemberService;
 import com.example.miniprojecttest.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
@@ -20,9 +21,6 @@ import java.io.IOException;
 public class JwtFilter extends OncePerRequestFilter {
     private final MemberService memberService;
     private final String secretKey;
-
-
-
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -45,20 +43,50 @@ public class JwtFilter extends OncePerRequestFilter {
         // member.getUsername();
 
         Member member = memberService.getMemberByConsumerID(username);
-        String memberUsername = member.getUsername();
-        if (!JwtUtils.validate(token, memberUsername, secretKey)) {
+
+        
+        // TODO: 수정이 필요한 코드
+        if (member != null) {
+            String memberUsername = member.getUsername();
+
+
+            if (!JwtUtils.validate(token, memberUsername, secretKey)) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                    member.getEmail(), null,
+                    member.getAuthorities()
+            );
+            // 인가하는 코드
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
             filterChain.doFilter(request, response);
-            return;
+        } else {
+            Seller seller = memberService.getMemberBySellerID(username);
+
+            String memberUsername = seller.getUsername();
+
+
+            if (!JwtUtils.validate(token, memberUsername, secretKey)) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                    seller.getEmail(), null,
+                    seller.getAuthorities()
+            );
+            // 인가하는 코드
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            filterChain.doFilter(request, response);
         }
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                member, null,
-                member.getAuthorities()
-        );
-        // 인가하는 코드
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        filterChain.doFilter(request, response);
 
     }
 }

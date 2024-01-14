@@ -2,10 +2,7 @@ package com.example.miniprojecttest.member.service;
 
 import com.example.miniprojecttest.member.model.entity.Member;
 import com.example.miniprojecttest.member.model.entity.Seller;
-import com.example.miniprojecttest.member.model.request.MemberLoginReq;
-import com.example.miniprojecttest.member.model.request.MemberSignupReq;
-import com.example.miniprojecttest.member.model.request.SellerSignupReq;
-import com.example.miniprojecttest.member.model.request.SendEmailReq;
+import com.example.miniprojecttest.member.model.request.*;
 import com.example.miniprojecttest.member.repository.MemberRepository;
 import com.example.miniprojecttest.member.repository.SellerRepository;
 import com.example.miniprojecttest.utils.JwtUtils;
@@ -41,8 +38,8 @@ public class MemberService implements UserDetailsService {
     private int expiredTimeMs;
 
     public Member consumerSignup(MemberSignupReq memberSignupReq) {
-        Member member = Member.builder()
-                .consumerID(memberSignupReq.getConsumerID())
+        Member member = memberRepository.save(Member.builder()
+                .email(memberSignupReq.getEmail())
                 .consumerPW(passwordEncoder.encode(memberSignupReq.getConsumerPW()))
                 .consumerName(memberSignupReq.getConsumerName())
                 .consumerAddr(memberSignupReq.getConsumerAddr())
@@ -50,50 +47,72 @@ public class MemberService implements UserDetailsService {
                 .authority("CONSUMER")
                 .socialLogin(false)
                 .status(false)
-                .build();
+                .build());
+
+        String accessToken = JwtUtils.generateAccessToken(member, secretKey, expiredTimeMs);
 
         SendEmailReq sendEmailReq = SendEmailReq.builder()
-                .email(member.getConsumerID())
+                .email(member.getEmail())
                 .authority(member.getAuthority())
+                .accessToken(accessToken)
                 .build();
 
         sendEmail(sendEmailReq);
-        memberRepository.save(member);
+
         return member;
 
     }
     public Seller sellerSignup(SellerSignupReq sellerSignupReq) {
-        Seller seller = Seller.builder()
-                .sellerID(sellerSignupReq.getSellerID())
-                .sellerPW(sellerSignupReq.getSellerPW())
+        Seller seller = sellerRepository.save(Seller.builder()
+                .email(sellerSignupReq.getEmail())
+                .sellerPW(passwordEncoder.encode(sellerSignupReq.getSellerPW()))
                 .sellerName(sellerSignupReq.getSellerName())
                 .sellerAddr(sellerSignupReq.getSellerAddr())
                 .sellerPhoneNum(sellerSignupReq.getSellerPhoneNum())
                 .sellerBusinessNumber(sellerSignupReq.getSellerBusinessNumber())
                 .authority("SELLER")
                 .status(false)
-                .build();
+                .build());
+
+        String accessToken = JwtUtils.generateAccessToken(seller, secretKey, expiredTimeMs);
 
         SendEmailReq sendEmailReq = SendEmailReq.builder()
-                .email(seller.getSellerID())
+                .email(seller.getEmail())
                 .authority(seller.getAuthority())
+                .accessToken(accessToken)
                 .build();
 
         sendEmail(sendEmailReq);
-        sellerRepository.save(seller);
 
         return seller;
 
     }
 
+    public Map<String,String> login(SellerLoginReq sellerLoginReq) {
+        Optional<Seller> seller = sellerRepository.findByEmail(sellerLoginReq.getEmail());
+
+        if (seller.isPresent()) {
+            if (passwordEncoder.matches(sellerLoginReq.getPassword(), seller.get().getPassword())) {
+
+                Map<String, String> response = new HashMap<>();
+                response.put("token", JwtUtils.generateAccessToken(seller.get(), secretKey, expiredTimeMs));
+                return response;
+
+            }else {
+                return null;
+            }
+        }
+        return null;
+    }
+
     public Map<String,String> login(MemberLoginReq memberLoginReq) {
-        Optional<Member> member = memberRepository.findByConsumerID(memberLoginReq.getUsername());
+        Optional<Member> member = memberRepository.findByEmail(memberLoginReq.getEmail());
 
         if (member.isPresent()) {
             if (passwordEncoder.matches(memberLoginReq.getPassword(), member.get().getPassword())) {
 
                 Map<String, String> response = new HashMap<>();
-                response.put("token", JwtUtils.generateAccessToken(member.get().getUsername(), secretKey, expiredTimeMs));
+                response.put("token", JwtUtils.generateAccessToken(member.get(), secretKey, expiredTimeMs));
                 return response;
 
             }else {
@@ -113,16 +132,24 @@ public class MemberService implements UserDetailsService {
                 + sendEmailReq.getEmail()
                 + "&authority=" + sendEmailReq.getAuthority()
                 + "&token=" + uuid
-                + "&jwt=" + JwtUtils.generateAccessToken(sendEmailReq.getEmail(), secretKey, expiredTimeMs)
+                + "&jwt=" + sendEmailReq.getAccessToken()
         );
         emailSender.send(message);
-
         emailVerifyService.create(sendEmailReq.getEmail(), uuid);
     }
 
 
-    public Member getMemberByConsumerID(String consumerID) {
-        Optional<Member> result = memberRepository.findByConsumerID(consumerID);
+    public Member getMemberByConsumerID(String email) {
+        Optional<Member> result = memberRepository.findByEmail(email);
+        if(result.isPresent()){
+            return result.get();
+        }
+        return null;
+    }
+
+    // TODO: 수정이 필요한 코드
+    public Seller getMemberBySellerID(String email) {
+        Optional<Seller> result = sellerRepository.findByEmail(email);
         if(result.isPresent()){
             return result.get();
         }
@@ -130,8 +157,8 @@ public class MemberService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<Member> result = memberRepository.findByConsumerID(username);
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        Optional<Member> result = memberRepository.findByEmail(email);
         Member member = null;
         if (result.isPresent())
             member = result.get();

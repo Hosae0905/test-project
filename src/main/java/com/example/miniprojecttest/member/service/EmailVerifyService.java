@@ -20,6 +20,7 @@ public class EmailVerifyService {
     private final EmailVerifyRepository emailVerifyRepository;
     private final MemberRepository memberRepository;
     private final SellerRepository sellerRepository;
+
     public RedirectView verify(GetEmailConfirmReq getEmailConfirmReq) {
         Optional<EmailVerify> result = emailVerifyRepository.findByEmail(getEmailConfirmReq.getEmail());
         if(result.isPresent()){
@@ -34,14 +35,14 @@ public class EmailVerifyService {
 
     public void update(String email, String authority) {
         if (authority.equals("CONSUMER")){
-            Optional<Member> result = memberRepository.findByConsumerID(email);
+            Optional<Member> result = memberRepository.findByEmail(email);
             if(result.isPresent()) {
                 Member member = result.get();
                 member.setStatus(true);
                 memberRepository.save(member);
             }
         }else if (authority.equals("SELLER")){
-            Optional<Seller> result = sellerRepository.findBySellerID(email);
+            Optional<Seller> result = sellerRepository.findByEmail(email);
             if(result.isPresent()) {
                 Seller seller = result.get();
                 seller.setStatus(true);

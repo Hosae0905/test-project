@@ -38,10 +38,18 @@ public class MemberController {
 
     @RequestMapping(method = RequestMethod.POST, value = "/login")
     public ResponseEntity login(@RequestBody MemberLoginReq memberLoginReq){
-        Map response = memberService.login(memberLoginReq);
+        Map<String, String> response = memberService.login(memberLoginReq);
 
         return ResponseEntity.ok().body(response);
     }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/seller/login")
+    public ResponseEntity login(@RequestBody SellerLoginReq sellerLoginReq){
+        Map<String, String> response = memberService.login(sellerLoginReq);
+
+        return ResponseEntity.ok().body(response);
+    }
+
     @RequestMapping(method = RequestMethod.GET,value = "confirm")
     public RedirectView confirm(GetEmailConfirmReq getEmailConfirmReq){
 

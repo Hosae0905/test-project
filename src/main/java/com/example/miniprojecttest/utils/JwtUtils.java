@@ -1,5 +1,7 @@
 package com.example.miniprojecttest.utils;
 
+import com.example.miniprojecttest.member.model.entity.Member;
+import com.example.miniprojecttest.member.model.entity.Seller;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -9,10 +11,25 @@ import java.security.Key;
 import java.util.Date;
 
 public class JwtUtils {
-    public static String generateAccessToken(String username, String key, int expiredTimeMs) {
+    public static String generateAccessToken(Member member, String key, int expiredTimeMs) {
         Claims claims = Jwts.claims();
-        claims.put("username", username);
+        claims.put("email", member.getEmail());
+        claims.put("idx", member.getConsumerIdx());
 
+        String token = Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + expiredTimeMs))
+                .signWith(getSignKey(key), SignatureAlgorithm.HS256)
+                .compact();
+
+        return token;
+    }
+
+    public static String generateAccessToken(Seller seller, String key, int expiredTimeMs) {
+        Claims claims = Jwts.claims();
+        claims.put("email", seller.getEmail());
+        claims.put("idx", seller.getSellerIdx());
 
         String token = Jwts.builder()
                 .setClaims(claims)
@@ -39,8 +56,11 @@ public class JwtUtils {
     }
 
     public static String getUsername(String token, String key) {
-        return extractAllClaims(token, key).get("username", String.class);
+        return extractAllClaims(token, key).get("email", String.class);
+    }
 
+    public static Long getUserIdx(String token, String key) {
+        return extractAllClaims(token, key).get("idx", Long.class);
     }
 
     public static Claims extractAllClaims(String token, String key) {
