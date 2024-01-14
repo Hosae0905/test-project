@@ -1,6 +1,6 @@
 package com.example.miniprojecttest.utils;
 
-import com.example.miniprojecttest.member.model.entity.Member;
+import com.example.miniprojecttest.member.model.entity.Consumer;
 import com.example.miniprojecttest.member.model.entity.Seller;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -11,7 +11,7 @@ import java.security.Key;
 import java.util.Date;
 
 public class JwtUtils {
-    public static String generateAccessToken(Member member, String key, int expiredTimeMs) {
+    public static String generateAccessToken(Consumer member, String key, int expiredTimeMs) {
         Claims claims = Jwts.claims();
         claims.put("email", member.getEmail());
         claims.put("idx", member.getConsumerIdx());

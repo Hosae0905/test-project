@@ -5,6 +5,6 @@ import lombok.Data;
 
 @Data
 @Builder
-public class MemberLoginRes {
+public class ConsumerLoginRes {
     String token;
 }

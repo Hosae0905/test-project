@@ -1,6 +1,5 @@
 package com.example.miniprojecttest.member.repository;
 
-import com.example.miniprojecttest.member.model.entity.Member;
 import com.example.miniprojecttest.member.model.entity.Seller;
 import org.springframework.data.jpa.repository.JpaRepository;
 

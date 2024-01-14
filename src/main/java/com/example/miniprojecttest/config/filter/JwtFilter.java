@@ -1,7 +1,7 @@
 package com.example.miniprojecttest.config.filter;
 
 
-import com.example.miniprojecttest.member.model.entity.Member;
+import com.example.miniprojecttest.member.model.entity.Consumer;
 import com.example.miniprojecttest.member.model.entity.Seller;
 import com.example.miniprojecttest.member.service.MemberService;
 import com.example.miniprojecttest.utils.JwtUtils;
@@ -42,7 +42,7 @@ public class JwtFilter extends OncePerRequestFilter {
         // db에서 엔티티 조회
         // member.getUsername();
 
-        Member member = memberService.getMemberByConsumerID(username);
+        Consumer member = memberService.getMemberByConsumerID(username);
 
         
         // TODO: 수정이 필요한 코드
