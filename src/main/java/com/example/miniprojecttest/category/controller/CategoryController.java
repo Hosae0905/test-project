@@ -13,9 +13,9 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
-    @RequestMapping(method = RequestMethod.GET, value = "/search/{idx}")
-    public ResponseEntity<Object> searchCategory(@PathVariable Long idx) {
-        return ResponseEntity.ok().body(categoryService.searchCategory(idx));
+    @RequestMapping(method = RequestMethod.GET, value = "/search/region/{region}")
+    public ResponseEntity<Object> searchRegion(@PathVariable String region) {
+        return ResponseEntity.ok().body(categoryService.searchRegion(region));
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/insert/{idx}")

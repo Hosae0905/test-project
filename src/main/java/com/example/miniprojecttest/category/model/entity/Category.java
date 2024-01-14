@@ -16,14 +16,14 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 public class Category {
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    private Long id;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     private String region;
     private String type;
 
     @OneToMany(mappedBy = "category")
-    private List<Product> products;
+    private List<CategoryToProduct> categoryList;
+
 }
