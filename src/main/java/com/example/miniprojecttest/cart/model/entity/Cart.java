@@ -17,7 +17,7 @@ import javax.persistence.*;
 public class Cart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long idx;
 
     // 상품이랑 연관관계 맺기
     @ManyToOne

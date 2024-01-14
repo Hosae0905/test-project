@@ -1,11 +1,9 @@
 package com.example.miniprojecttest.product.model.entity;
 
 import com.example.miniprojecttest.cart.model.entity.Cart;
+import com.example.miniprojecttest.category.model.entity.Category;
 import com.example.miniprojecttest.member.model.entity.Seller;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
@@ -13,6 +11,7 @@ import java.util.List;
 @Entity
 @Builder
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class Product {
@@ -40,6 +39,9 @@ public class Product {
 
 
     // 카테고리 ID
+    @ManyToOne
+    @JoinColumn(name = "Category_idx")
+    private Category category;
 
     // 장바구니
     @OneToMany(mappedBy = "product")

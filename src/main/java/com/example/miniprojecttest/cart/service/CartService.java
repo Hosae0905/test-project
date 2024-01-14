@@ -46,7 +46,7 @@ public class CartService {
             for (Cart cart : carts) {
                 Product product = cart.getProduct();
                 cartList.add(GetCartListRes.builder()
-                        .idx(cart.getId())
+                        .idx(cart.getIdx())
                         .productName(product.getProductName())
                         .price(product.getPrice())
                         .image(product.getImages().get(0).getImagePath())
