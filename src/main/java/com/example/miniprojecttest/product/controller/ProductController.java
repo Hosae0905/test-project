@@ -1,18 +1,14 @@
 package com.example.miniprojecttest.product.controller;
 
-import com.example.miniprojecttest.member.model.entity.Seller;
-import com.example.miniprojecttest.product.model.entity.Product;
+import com.example.miniprojecttest.product.model.request.PatchProductUpdateReq;
 import com.example.miniprojecttest.product.model.request.PostProductRegisterReq;
-import com.example.miniprojecttest.product.model.request.PostProductResgisterRes;
+import com.example.miniprojecttest.product.model.response.PostProductResgisterRes;
 import com.example.miniprojecttest.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.security.Principal;
 
 @RestController
 @RequestMapping("/product")
@@ -26,23 +22,29 @@ public class ProductController {
         return ResponseEntity.ok(postProductResgisterRes);
     }
 
-    /* @RequestMapping(method = RequestMethod.POST, value = "/list")
-    public void list() {
-        productService.list();
+    @RequestMapping(method = RequestMethod.GET, value = "/list")
+    public ResponseEntity list(@AuthenticationPrincipal String email,Integer page, Integer size) {
+
+
+        return ResponseEntity.ok().body(productService.list(email,page, size));
+    }
+    @GetMapping("/read/{idx}")
+    public ResponseEntity read(@AuthenticationPrincipal String email,@PathVariable Long idx) {
+        return ResponseEntity.ok().body(productService.read(email,idx));
+
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/{idx}")
-    public void getProduct(@PathVariable Long idx) {
-        productService.getProduct(idx);
+    @RequestMapping(method = RequestMethod.PATCH, value = "/update")
+    public ResponseEntity update(@AuthenticationPrincipal String email,PatchProductUpdateReq patchProductUpdateReq) {
+        productService.update(email,patchProductUpdateReq);
+
+        return ResponseEntity.ok().body("수정");
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/update/{idx}")
-    public void update(@PathVariable Long idx) {
-        productService.update(idx);
-    }
+    @RequestMapping(method = RequestMethod.DELETE, value = "/delete/{idx}")
+    public ResponseEntity delete(@AuthenticationPrincipal String email,@PathVariable Long idx) {
+        productService.delete(email,idx);
+        return ResponseEntity.ok().body("삭제");
 
-    @RequestMapping(method = RequestMethod.POST, value = "/delete/{idx}")
-    public void delete(@PathVariable Long idx) {
-        productService.delete(idx);
-    }*/
+    }
 }

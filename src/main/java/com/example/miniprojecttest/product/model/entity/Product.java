@@ -1,8 +1,6 @@
 package com.example.miniprojecttest.product.model.entity;
 
 import com.example.miniprojecttest.cart.model.entity.Cart;
-import com.example.miniprojecttest.category.model.entity.Category;
-import com.example.miniprojecttest.category.model.entity.CategoryToProduct;
 import com.example.miniprojecttest.member.model.entity.Seller;
 import lombok.*;
 
@@ -22,28 +20,24 @@ public class Product {
 
     private String productName;
     private Integer price;
+    private Integer salePrice;
     private String productInfo;
 
 //    private Integer peopleCount;
 //    private Date startAt;
 //    private Date closeAt;
     // TODO: 연관관계 설정 후 외래키 지정
-    @OneToMany(mappedBy = "product")
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "product",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductImage> images;
 
     // 판매자 테이블과 연관 관계 매핑 설정 완료
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "Seller_ID")
+    @JoinColumn(name = "Customer_ID")
     private Seller sellerIdx ;
 
-    // 판매자 ID
-
-
     // 카테고리 ID
-    @OneToMany(mappedBy = "product")
-    private List<CategoryToProduct> categoryList;
 
     // 장바구니
-    @OneToMany(mappedBy = "product")
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "product")
     private List<Cart> carts;
 }
